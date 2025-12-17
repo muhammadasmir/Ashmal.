@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Ashmal</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&family=Quicksand:wght@400;500;700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- RESET & CORE --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; /* Hide default cursor */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            color: #5d4037;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            height: 100vh;
+            background: linear-gradient(135deg, #fff0f5, #ffebee);
+            transition: background 1.5s ease-in-out; 
+        }
+
+        /* --- BACKGROUND CLOUDS & PARTICLES --- */
+        #bg-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .cloud {
+            position: absolute;
+            background: #fff;
+            border-radius: 50px;
+            box-shadow: 0 15px 35px rgba(100, 100, 100, 0.1);
+            opacity: 0.8;
+            background-image: radial-gradient(circle at 30% 30%, rgba(255,255,255,1), rgba(240,240,240,0.8));
+            animation: driftCloud linear infinite;
+        }
+        
+        .cloud::after {
+            content: ''; position: absolute;
+            width: 70%; height: 70%;
+            background: inherit; border-radius: 50%;
+            top: -40%; left: 15%;
+        }
+        .cloud::before {
+            content: ''; position: absolute;
+            width: 50%; height: 50%;
+            background: inherit; border-radius: 50%;
+            top: -25%; right: 10%;
+        }
+
+        @keyframes driftCloud {
+            from { transform: translateX(-150px); }
+            to { transform: translateX(110vw); }
+        }
+
+        .particle {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.6;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- VISIBLE CURSOR --- */
+        #cursor {
+            position: fixed;
+            font-size: 28px;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease-out;
+            display: flex; justify-content: center; align-items: center;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.1));
+        }
+        #cursor::after { content: '🌸'; }
+
+        .cursor-trail {
+            position: fixed; font-size: 14px; pointer-events: none; z-index: 9999;
+            animation: sparkleFade 0.8s forwards;
+        }
+        @keyframes sparkleFade {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        /* --- SECTIONS --- */
+        section {
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 2;
+            background: transparent; 
+        }
+
+        h1 {
+            font-family: 'Nunito', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            text-shadow: 0 2px 10px rgba(255,255,255,0.5);
+            color: #4e342e;
+        }
+
+        .instruction {
+            font-size: 0.9rem; opacity: 0.7; margin-bottom: 1rem;
+            letter-spacing: 1px; text-transform: uppercase; font-weight: bold;
+            background: rgba(255,255,255,0.4); padding: 5px 10px; border-radius: 20px;
+        }
+
+        /* --- CARDS --- */
+        .card-container {
+            display: flex; gap: 15px; margin-bottom: 2rem;
+            flex-wrap: wrap; justify-content: center;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 15px 25px; border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            backdrop-filter: blur(5px);
+            font-size: 1rem; font-weight: 600;
+            cursor: none; pointer-events: auto;
+            transition: transform 0.3s ease;
+            animation: floatCard 4s ease-in-out infinite;
+        }
+        .card:hover { transform: scale(1.05); background: rgba(255,255,255,0.9); }
+        @keyframes floatCard { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+        /* --- CHARACTER --- */
+        .character-wrapper {
+            position: absolute; bottom: 30px; right: 30px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .character {
+            width: 55px; height: 50px; background: #fff;
+            border: 2px solid #5d4037; border-radius: 50% 50% 45% 45%;
+            position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            animation: idleBob 3s infinite ease-in-out; pointer-events: auto;
+        }
+        .character::before {
+            content: "• ‿ •"; position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 12px; color: #5d4037; font-weight: bold; white-space: nowrap;
+        }
+        .bubble {
+            position: absolute; bottom: 65px; background: #fff;
+            padding: 8px 12px; border-radius: 15px; font-size: 0.8rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); white-space: nowrap;
+            opacity: 0; transform: translateY(10px); transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .character:hover + .bubble { opacity: 1; transform: translateY(0); }
+        @keyframes idleBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+        /* --- PUZZLES & REWARDS --- */
+        .puzzle-area {
+            margin-top: 1rem; min-height: 120px;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column;
+        }
+        .reward-message {
+            display: none; background: rgba(255,255,255,0.9);
+            padding: 2rem; border-radius: 20px; max-width: 500px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            animation: softReveal 0.8s ease forwards;
+        }
+        .reward-message h2 { color: #ff8a80; font-size: 1.5rem; margin-bottom: 0.5rem; }
+        @keyframes softReveal { from{opacity:0;transform:scale(0.9) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+
+        .math-btn {
+            padding: 10px 20px; border-radius: 15px; background: rgba(255,255,255,0.5);
+            border: 2px solid #8d6e63; margin: 0 10px; font-weight: bold;
+            pointer-events: auto; transition: all 0.3s;
+        }
+        .math-btn.active { background: #ff8a80; color: white; border-color: #ff8a80; }
+
+        .slider-container { width: 250px; }
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; height: 10px; border-radius: 10px;
+            background: rgba(255,255,255,0.5); outline: none; pointer-events: auto;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 25px; height: 25px; border-radius: 50%;
+            background: #ff8a80; cursor: none;
+        }
+
+        .hold-btn {
+            width: 80px; height: 80px; border-radius: 50%; background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; pointer-events: auto; overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .hold-fill {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
+            background: #ffe0b2; transition: height 0.1s linear;
+        }
+        .hold-icon { z-index: 2; font-size: 1.5rem; }
+
+        .fog-wrapper {
+            position: relative;
+            width: 300px;
+            height: 100px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .fog-text { font-weight: bold; color: #5d4037; z-index: 1; }
+        .fog-layer {
+            position: absolute; top:0; left:0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2;
+            display: flex; align-items: center; justify-content: center;
+            cursor: none; pointer-events: auto;
+            transition: opacity 1.5s ease;
+        }
+        .fog-layer span { font-size: 2rem; opacity: 0.5; }
+        .fog-layer:hover { background: rgba(255,255,255,0.5); }
+
+        .shape-row { display: flex; gap: 20px; }
+        .rotatable {
+            width: 50px; height: 50px; background: #90caf9;
+            border-radius: 10px; pointer-events: auto;
+            transition: transform 0.5s; display: flex; align-items: center; justify-content: center;
+        }
+        .rotatable::after { content: "↑"; color: white; font-weight: bold; }
+
+        .plant-stage { font-size: 4rem; transition: all 0.5s; }
+        .watering-can { font-size: 2.5rem; pointer-events: auto; margin-top: 10px; transition: transform 0.2s; }
+        .watering-can:active { transform: rotate(-30deg); }
+
+        /* --- LETTER --- */
+        .letter-btn {
+            position: absolute; bottom: 30px; left: 30px;
+            background: rgba(255,255,255,0.8); padding: 10px 15px;
+            border-radius: 30px; font-size: 0.9rem; color: #5d4037; font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: none; pointer-events: auto;
+            transition: all 0.3s ease; z-index: 10; display: flex; align-items: center; gap: 8px;
+            animation: pulseBtn 2s infinite;
+        }
+        @keyframes pulseBtn { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+
+        .letter-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(93, 64, 55, 0.4); backdrop-filter: blur(8px);
+            z-index: 20000; display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.5s ease;
+        }
+        
+        .letter-box {
+            background: #fffdf5; width: 90%; max-width: 600px;
+            max-height: 85vh; overflow-y: auto; padding: 40px; border-radius: 5px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2); position: relative;
+            transform: scale(0.5); transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background-image: linear-gradient(#e0e0e0 1px, transparent 1px);
+            background-size: 100% 30px; line-height: 30px;
+        }
+
+        .letter-content-text {
+            font-family: 'Dancing Script', cursive; font-size: 1.4rem; color: #4e342e; text-align: left;
+        }
+
+        .close-letter {
+            position: absolute; top: 15px; right: 20px; font-size: 2rem; color: #a1887f;
+            cursor: none; pointer-events: auto; line-height: 1;
+        }
+
+        /* --- AUDIO UI (HIDDEN) --- */
+        #audio-status {
+            position: fixed; top: 20px; right: 20px; z-index: 9999;
+            background: rgba(255,255,255,0.6); padding: 5px 12px; border-radius: 20px;
+            font-size: 0.7rem; color: #5d4037; backdrop-filter: blur(5px);
+            pointer-events: none; opacity: 0.8;
+        }
+
+    </style>
+</head>
+<body onclick="handleFirstClick()">
+
+    <audio id="myAudio" loop>
+        <source src="song.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div id="audio-status">Tap anywhere for music 🎵</div>
+
+    <div id="bg-layer"></div>
+    <div id="cursor"></div>
+
+    <section id="slide1" data-color="linear-gradient(135deg, #fff0f5, #ffcdd2)">
+        <h1>Hey Ashmal, wanted to let you know something…</h1>
+        
+        <div class="card-container">
+            <div class="card">A small thought</div>
+            <div class="card">Just for you</div>
+        </div>
+
+        <div class="puzzle-area" id="puzzle1">
+            <p class="instruction">Solve: 1, 2, 3</p>
+            <div style="display:flex;">
+                <div class="math-btn" onclick="checkMath(1, this)">4 - 3</div>
+                <div class="math-btn" onclick="checkMath(2, this)">√4</div>
+                <div class="math-btn" onclick="checkMath(3, this)">9 ÷ 3</div>
+            </div>
+        </div>
+
+        <div class="reward-message" id="reward1">
+            <h2>You are my first thought.</h2>
+            <p>Before the day even starts, my mind finds its way to you. I dont know what it is; it's just where my heart naturally goes.</p>
+        </div>
+
+        <div class="character-wrapper">
+            <div class="character"></div>
+            <div class="bubble">Hi Ashmal!</div>
+        </div>
+    </section>
+
+    <section id="slide2" data-color="linear-gradient(135deg, #f3e5f5, #e1bee7)">
+        <h1>The Noise vs. The Quiet</h1>
+        <div class="card-container">
+            <div class="card">The world is loud</div>
+            <div class="card">You are my peace</div>
+        </div>
+        <div class="puzzle-area" id="puzzle2">
+            <p class="instruction">Slide to reveal✨</p>
+            <div class="slider-container">
+                <input type="range" min="0" max="100" value="0" oninput="checkSlide(this)">
+            </div>
+        </div>
+        <div class="reward-message" id="reward2">
+            <h2>A Deeper Beauty</h2>
+            <p>The world has really pretty things, but your beauty feels different. It's deep, quiet, and overwhelming, makes me rethink every second and the world fades when I look at you.</p>
+        </div>
+        <div class="character-wrapper">
+            <div class="character"></div>
+            <div class="bubble">bass yawrr.</div>
+        </div>
+    </section>
+
+    <section id="slide3" data-color="linear-gradient(135deg, #fff8e1, #ffe0b2)">
+        <h1>It Happens Every Time, literally har waqt😭</h1>
+        <div class="card-container">
+            <div class="card">Not just once</div>
+            <div class="card">Over and over</div>
+        </div>
+        <div class="puzzle-area" id="puzzle3">
+            <p class="instruction">Hold to feel it</p>
+            <div class="hold-btn" onmousedown="startHold()" onmouseup="endHold()" onmouseleave="endHold()" ontouchstart="startHold()" ontouchend="endHold()">
+                <div class="hold-fill" id="holdFill"></div>
+                <div class="hold-icon">♥</div>
+            </div>
+        </div>
+        <div class="reward-message" id="reward3">
+            <h2>I Fall Again</h2>
+            <p>It's not past tense. Every time I see you, every time I hear you, I fall all over again. It never stops happening, this cycle is never ending dude I can't.</p>
+        </div>
+        <div class="character-wrapper">
+            <div class="character"></div>
+            <div class="bubble">Thump thump.</div>
+        </div>
+    </section>
+
+    <section id="slide4" data-color="linear-gradient(135deg, #e0f2f1, #b2dfdb)">
+        <h1>You feel like a familiar life to me</h1>
+        <div class="card-container">
+            <div class="card">Just see</div>
+            <div class="card">Feel it</div>
+        </div>
+        <div class="puzzle-area" id="puzzle4">
+            <p class="instruction">Tap the cloud to clear the fog</p>
+            <div class="fog-wrapper">
+                <div class="fog-text">You are my Clarity.</div>
+                <div class="fog-layer" onclick="clearFog(this)">
+                    <span>☁️</span>
+                </div>
+            </div>
+        </div>
+        <div class="reward-message" id="reward4">
+            <h2>You Feel Like Safety</h2>
+            <p>Your voice is the sound of coming home. In a chaotic life, your presence is the one place where I feel that I have a purpose.</p>
+        </div>
+        <div class="character-wrapper">
+            <div class="character"></div>
+            <div class="bubble">Clear skies.</div>
+        </div>
+    </section>
+
+    <section id="slide5" data-color="linear-gradient(135deg, #e8eaf6, #9fa8da)">
+        <h1>The Choice</h1>
+        <div class="card-container">
+            <div class="card">No doubt</div>
+            <div class="card">Fully certain</div>
+            <div class="card">Only you</div>
+        </div>
+        <div class="puzzle-area" id="puzzle5">
+            <p class="instruction">Align arrows upwards</p>
+            <div class="shape-row">
+                <div class="rotatable" onclick="rotateShape(this)" style="transform: rotate(90deg)"></div>
+                <div class="rotatable" onclick="rotateShape(this)" style="transform: rotate(180deg)"></div>
+                <div class="rotatable" onclick="rotateShape(this)" style="transform: rotate(-90deg)"></div>
+            </div>
+        </div>
+        <div class="reward-message" id="reward5">
+            <h2>My Priority</h2>
+            <p>My heart doesn't divide its attention. I choose you, consciously and willingly. You are my top priority, above the noise, always.</p>
+        </div>
+        <div class="character-wrapper">
+            <div class="character"></div>
+            <div class="bubble">I choose you.</div>
+        </div>
+    </section>
+
+    <section id="slide6" data-color="linear-gradient(135deg, #fffde7, #fff59d)">
+        <h1>Simply, You.</h1>
+        <div class="card-container">
+            <div class="card">Gratitude</div>
+            <div class="card">Forever</div>
+        </div>
+        <div class="puzzle-area" id="puzzle6">
+            <p class="instruction">Water the seed (Tap can)</p>
+            <div class="plant-stage" id="plant">🌱</div>
+            <div class="watering-can" onclick="waterPlant()">🚿</div>
+        </div>
+        <div class="reward-message" id="reward6">
+            <h2>Glad You Exist</h2>
+            <p>This isn't just admiration. It's a deep, settled knowing that life is better because you are in it. Just you. Always.</p>
+        </div>
+        <div class="character-wrapper">
+            <div class="character"></div>
+            <div class="bubble">Stay forever.</div>
+        </div>
+        <div class="letter-btn" onclick="openLetter()">
+            <span>📩</span> Read Me
+        </div>
+    </section>
+
+    <div class="letter-overlay" id="letterOverlay">
+        <div class="letter-box" id="letterBox">
+            <div class="close-letter" onclick="closeLetter()">&times;</div>
+            <div class="letter-content-text">
+                <p>Ashmal,</p>
+                <br>
+                <p>Since the days of 3rd grade, you have been the quiet constant in my life. There hasn't been a single sunrise or sunset where my mind didn't drift to you. I often battle the thought that I might not be enough, that I might not fit the mold of what you deserve, but the truth is—you are simply <strong>everything</strong> to me. I live because of you, and in my heart, I only want to walk through this life with you, no matter what storms may come.</p>
+                <br>
+                <p>I stayed silent for so long, terrified that my feelings might make you feel uneasy. It feels foolish now, but I just wanted to protect your peace, even while I could barely think straight whenever you were near.</p>
+                <br>
+                <p>I understand if your heart doesn't mirror mine, or if this is something you don't wish to share. But if you are ever willing to let me in, know this: I am ready to change, to grow, and to reshape my entire world from head to toe, just for you.</p>
+                <br>
+                <p style="text-align: right;">— Always yours, Asmir</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- AUDIO LOGIC --- */
+        const audio = document.getElementById('myAudio');
+        const audioStatus = document.getElementById('audio-status');
+        let musicStarted = false;
+
+        function handleFirstClick() {
+            if (!musicStarted) {
+                audio.play().then(() => {
+                    musicStarted = true;
+                    audioStatus.innerText = "Playing 🎵";
+                    setTimeout(() => audioStatus.style.opacity = '0', 2000);
+                }).catch(error => {
+                    console.log("Audio play failed:", error);
+                });
+            }
+        }
+
+        /* --- BACKGROUND MANAGER (Soft Transitions) --- */
+        const bgLayer = document.getElementById('bg-layer');
+        for(let i=0; i<6; i++) {
+            let cloud = document.createElement('div');
+            cloud.classList.add('cloud');
+            cloud.style.width = (Math.random() * 100 + 100) + 'px';
+            cloud.style.height = (Math.random() * 60 + 40) + 'px';
+            cloud.style.top = Math.random() * 100 + '%';
+            cloud.style.left = -Math.random() * 20 + '%'; 
+            cloud.style.animationDuration = (Math.random() * 20 + 30) + 's';
+            cloud.style.opacity = Math.random() * 0.5 + 0.3;
+            bgLayer.appendChild(cloud);
+        }
+
+        function createParticle() {
+            const el = document.createElement('div');
+            el.classList.add('particle');
+            const icons = ['🌸', '✨', '🤍', '🎀'];
+            el.innerText = icons[Math.floor(Math.random() * icons.length)];
+            el.style.left = Math.random() * 100 + '%';
+            el.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            bgLayer.appendChild(el);
+            setTimeout(() => el.remove(), 10000); 
+        }
+        setInterval(createParticle, 800);
+
+        const sections = document.querySelectorAll('section');
+        const observerOptions = { threshold: 0.5 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    const color = entry.target.getAttribute('data-color');
+                    document.body.style.background = color;
+                }
+            });
+        }, observerOptions);
+        sections.forEach(s => observer.observe(s));
+
+        /* --- CURSOR --- */
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            cursor.style.transform = `translate(-50%, -50%) rotate(${e.clientX * 0.2}deg)`;
+            
+            if(Math.random() > 0.9) {
+                const trail = document.createElement('div');
+                trail.className = 'cursor-trail';
+                trail.innerText = '✨';
+                trail.style.left = e.clientX + 'px';
+                trail.style.top = e.clientY + 'px';
+                document.body.appendChild(trail);
+                setTimeout(() => trail.remove(), 800);
+            }
+        });
+
+        /* --- INTERACTION LOGIC --- */
+        function solve(id) {
+            const puzzle = document.getElementById('puzzle' + id);
+            const reward = document.getElementById('reward' + id);
+            puzzle.style.opacity = '0';
+            setTimeout(() => {
+                puzzle.style.display = 'none';
+                reward.style.display = 'block';
+            }, 500);
+        }
+
+        let mathStep = 1;
+        function checkMath(num, btn) {
+            if(num === mathStep) {
+                btn.classList.add('active');
+                mathStep++;
+                if(mathStep > 3) solve(1);
+            } else {
+                document.querySelectorAll('.math-btn').forEach(b => b.classList.remove('active'));
+                mathStep = 1;
+            }
+        }
+
+        function checkSlide(range) {
+            if(parseInt(range.value) === 100) solve(2);
+        }
+
+        let holdTimer;
+        const fill = document.getElementById('holdFill');
+        function startHold() {
+            fill.style.height = '100%';
+            fill.style.transition = 'height 2s linear';
+            holdTimer = setTimeout(() => { solve(3); }, 2000);
+        }
+        function endHold() {
+            clearTimeout(holdTimer);
+            fill.style.transition = 'height 0.2s ease-out';
+            fill.style.height = '0%';
+        }
+
+        function clearFog(el) {
+            el.style.opacity = '0';
+            setTimeout(() => { solve(4); }, 800);
+        }
+
+        function rotateShape(el) {
+            let current = parseInt(el.style.transform.replace(/[^\d-]/g, '')) || 0;
+            el.style.transform = `rotate(${current + 90}deg)`;
+            setTimeout(checkAlignment, 600);
+        }
+        function checkAlignment() {
+            const shapes = document.querySelectorAll('.rotatable');
+            let aligned = true;
+            shapes.forEach(s => {
+                let deg = parseInt(s.style.transform.replace(/[^\d-]/g, '')) || 0;
+                if((deg % 360) !== 0) aligned = false;
+            });
+            if(aligned) solve(5);
+        }
+
+        let waterCount = 0;
+        const plant = document.getElementById('plant');
+        function waterPlant() {
+            waterCount++;
+            if(waterCount === 1) plant.innerText = '🌿';
+            if(waterCount === 3) plant.innerText = '🪴';
+            if(waterCount === 5) {
+                plant.innerText = '🌷';
+                setTimeout(() => solve(6), 600);
+            }
+        }
+
+        function openLetter() {
+            const overlay = document.getElementById('letterOverlay');
+            const box = document.getElementById('letterBox');
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+                box.style.transform = 'scale(1)';
+            }, 10);
+        }
+
+        function closeLetter() {
+            const overlay = document.getElementById('letterOverlay');
+            const box = document.getElementById('letterBox');
+            box.style.transform = 'scale(0.5)';
+            overlay.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 500);
+        }
+    </script>
+</body>
+</html>
